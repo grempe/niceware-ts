@@ -1,0 +1,88 @@
+{
+  "name": "niceware-ts",
+  "description": "Niceware-TS is a TypeScript implementation of Niceware, a method for generating or converting random bytes into English language passphrases.",
+  "author": "Glenn Rempe <glenn@rempe.us>",
+  "version": "0.0.1",
+  "private": false,
+  "source": "./src/index.ts",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    "require": "./dist/index.cjs",
+    "import": "./dist/index.js",
+    "node": "./dist/index.cjs",
+    "default": "./dist/index.js"
+  },
+  "license": "MIT License",
+  "url": "https://github.com/grempe/niceware-ts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/grempe/niceware-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/grempe/niceware-ts/issues"
+  },
+  "keywords": [
+    "niceware",
+    "passphrase",
+    "password",
+    "random",
+    "randomness",
+    "entropy",
+    "encryption",
+    "decryption",
+    "crypto",
+    "cryptography",
+    "security",
+    "secure",
+    "key"
+  ],
+  "scripts": {
+    "ts-types": "tsc",
+    "build": "rimraf dist && env NODE_ENV=production tsup",
+    "build:dev": "rimraf dist && tsup --watch",
+    "build:watch": "tsup --watch",
+    "clean": "rm -rf dist",
+    "lint:fix": "eslint ./src --ext .ts,.tsx --quiet --fix --ignore-path ./.gitignore",
+    "lint:format": "prettier  --loglevel warn --write \"./**/*.{ts,tsx,css,md,json}\" ",
+    "lint": "pnpm run lint:format && pnpm run lint:fix",
+    "package-check": "npx package-check",
+    "test": "vitest --run",
+    "test:bench": "vitest bench",
+    "test:coverage": "vitest --coverage",
+    "test:watch": "vitest",
+    "examples:nodejs": "pnpm run build && cd examples/nodejs && node ./index.cjs",
+    "examples:deno": "pnpm run build && cd examples/deno && deno run ./index.ts"
+  },
+  "devDependencies": {
+    "@skypack/package-check": "^0.2.2",
+    "@stablelib/random": "^1.0.2",
+    "@types/node": "^20.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "@vitest/coverage-c8": "^0.31.0",
+    "eslint": "^8.16.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "prettier": "^2.6.2",
+    "rimraf": "^3.0.2",
+    "tsup": "^6.0.1",
+    "vitest": "^0.31.0"
+  },
+  "dependencies": {
+    "typescript": "^4.1.0"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "package.json",
+    "/src",
+    "/dist",
+    "/examples",
+    "/tests"
+  ]
+}
