@@ -2,7 +2,7 @@
   "name": "niceware-ts",
   "description": "Niceware-TS is a TypeScript implementation of Niceware, a method for generating or converting random bytes into English language passphrases.",
   "author": "Glenn Rempe <glenn@rempe.us>",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": false,
   "source": "./src/index.ts",
   "main": "dist/index.cjs",
