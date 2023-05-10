@@ -1,4 +1,5 @@
 import { randomBytes } from '@stablelib/random';
+
 import { wordlist } from './wordlist';
 
 export const MAX_PASSPHRASE_ENTROPY_BYTES = 1024;
@@ -110,7 +111,9 @@ export function passphraseToBytes(passphrase: string | string[]): Uint8Array {
 
   // Test that the passphrase argument is an Array
   if (!Array.isArray(passphrase)) {
-    throw new Error('passphrase must be an array, or a string with words separated by spaces');
+    throw new Error(
+      'passphrase must be an array, or a string with words separated by spaces',
+    );
   }
 
   if (passphrase.length === 0) {
@@ -128,7 +131,9 @@ export function passphraseToBytes(passphrase: string | string[]): Uint8Array {
   }
 
   if (passphrase.length > MAX_PASSPHRASE_ENTROPY_BYTES / 2) {
-    throw new Error(`passphrase must be no longer than ${MAX_PASSPHRASE_ENTROPY_BYTES / 2} words`);
+    throw new Error(
+      `passphrase must be no longer than ${MAX_PASSPHRASE_ENTROPY_BYTES / 2} words`,
+    );
   }
 
   const bytes = new Uint8Array(passphrase.length * 2);

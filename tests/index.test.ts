@@ -3,7 +3,7 @@ import {
   bytesToPassphrase,
   generatePassphrase,
   passphraseToBytes,
-  MAX_PASSPHRASE_ENTROPY_BYTES
+  MAX_PASSPHRASE_ENTROPY_BYTES,
 } from '../src/index';
 
 describe('generatePassphrase', () => {
@@ -67,9 +67,7 @@ describe('passphraseToBytes', () => {
     expect(passphraseToBytes('a')).toEqual(new Uint8Array([0x00, 0x00]));
     expect(passphraseToBytes('zyzzyva')).toEqual(new Uint8Array([0xff, 0xff]));
     expect(
-      passphraseToBytes(
-        'a billet baiting glum crawl writhing deplane zyzzyva',
-      ),
+      passphraseToBytes('a billet baiting glum crawl writhing deplane zyzzyva'),
     ).toEqual(
       new Uint8Array([
         0, 0, 17, 212, 12, 140, 90, 247, 46, 83, 254, 60, 54, 169, 255, 255,
@@ -96,9 +94,7 @@ describe('passphraseToBytes', () => {
     expect(() => passphraseToBytes(1)).toThrow(
       'passphrase must be an array, or a string with words separated by spaces',
     );
-    expect(() => passphraseToBytes([])).toThrow(
-      'passphrase must have at least one word',
-    );
+    expect(() => passphraseToBytes([])).toThrow('passphrase must have at least one word');
     // @ts-expect-error
     expect(() => passphraseToBytes([1, 2, 3])).toThrow(
       'passphrase must be an array of strings',
@@ -107,9 +103,7 @@ describe('passphraseToBytes', () => {
       'passphrase has an invalid word: apple',
     );
     expect(() => {
-      passphraseToBytes((new Array(513).fill('a')).join(' '))
-    }).toThrow(
-      `passphrase must be no longer than 512 words`,
-    );
+      passphraseToBytes(new Array(513).fill('a').join(' '));
+    }).toThrow(`passphrase must be no longer than 512 words`);
   });
 });

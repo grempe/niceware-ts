@@ -51,11 +51,7 @@ npm install niceware-ts
 Then, import the functions you need from the module:
 
 ```typescript
-import {
-  bytesToPassphrase,
-  generatePassphrase,
-  passphraseToBytes,
-} from "niceware-ts";
+import { bytesToPassphrase, generatePassphrase, passphraseToBytes } from 'niceware-ts';
 
 // Generate a passphrase with 16 bytes (128 bits) of entropy
 const passphrase = generatePassphrase(16, true);

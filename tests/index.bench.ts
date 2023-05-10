@@ -1,9 +1,5 @@
 import { describe, expect, bench } from 'vitest';
-import {
-  bytesToPassphrase,
-  generatePassphrase,
-  passphraseToBytes,
-} from '../src/index';
+import { bytesToPassphrase, generatePassphrase, passphraseToBytes } from '../src/index';
 
 describe('benchmark', () => {
   bench('generatePassphrase', () => {
@@ -34,8 +30,8 @@ describe('benchmark', () => {
   bench('bytesToPassphrase', () => {
     bytesToPassphrase(
       new Uint8Array([
-        65, 87, 174, 214, 214, 199, 62, 136, 175, 4, 14, 27, 4, 76, 71, 107, 164, 220, 153,
-        35, 107, 76, 35, 171, 96, 187, 249, 128, 173, 211, 144, 224,
+        65, 87, 174, 214, 214, 199, 62, 136, 175, 4, 14, 27, 4, 76, 71, 107, 164, 220,
+        153, 35, 107, 76, 35, 171, 96, 187, 249, 128, 173, 211, 144, 224,
       ]),
     );
   });

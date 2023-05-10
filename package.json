@@ -49,12 +49,14 @@
     "lint:format": "prettier  --loglevel warn --write \"./**/*.{ts,tsx,css,md,json}\" ",
     "lint": "pnpm run lint:format && pnpm run lint:fix",
     "package-check": "npx package-check",
+    "pre-publish": "pnpm run package-check && pnpm run build && pnpm run test && pnpm run lint && pnpm run examples",
     "test": "vitest --run",
     "test:bench": "vitest bench",
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest",
-    "examples:nodejs": "pnpm run build && cd examples/nodejs && node ./index.cjs",
-    "examples:deno": "pnpm run build && cd examples/deno && deno run ./index.ts"
+    "examples": "pnpm run examples:nodejs && pnpm run examples:deno",
+    "examples:nodejs": "cd examples/nodejs && node ./index.cjs",
+    "examples:deno": "cd examples/deno && deno run ./index.ts"
   },
   "devDependencies": {
     "@skypack/package-check": "^0.2.2",
