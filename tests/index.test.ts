@@ -39,27 +39,30 @@ describe('bytesToPassphrase', () => {
   });
 
   test('converts even length bytes to a passphrase', () => {
-    expect(bytesToPassphrase(new Uint8Array([0x00, 0x00]), true)).toBe('a');
-    expect(bytesToPassphrase(new Uint8Array([0xff, 0xff]), true)).toBe('zyzzyva');
+    expect(bytesToPassphrase(new Uint8Array([0x00, 0x00])).join(' ')).toBe('a');
+    expect(bytesToPassphrase(new Uint8Array([0xff, 0xff])).join(' ')).toBe('zyzzyva');
     expect(
       bytesToPassphrase(
         new Uint8Array([
           0, 0, 17, 212, 12, 140, 90, 247, 46, 83, 254, 60, 54, 169, 255, 255,
         ]),
-        true,
-      ),
+      ).join(' '),
     ).toBe('a billet baiting glum crawl writhing deplane zyzzyva');
   });
 
   test('converts odd length bytes to a padded passphrase', () => {
-    expect(bytesToPassphrase(new Uint8Array([0x00, 0x00, 0x00]), true)).toBe('a accompanying pad safely');
-    expect(bytesToPassphrase(new Uint8Array([0xff, 0xff, 0xff]), true)).toBe('zyzzyva yoked pad safely');
+    expect(bytesToPassphrase(new Uint8Array([0x00, 0x00, 0x00])).join(' ')).toBe(
+      'a accompanying pad safely',
+    );
+    expect(bytesToPassphrase(new Uint8Array([0xff, 0xff, 0xff])).join(' ')).toBe(
+      'zyzzyva yoked pad safely',
+    );
     expect(
       bytesToPassphrase(
         new Uint8Array([
           0, 0, 17, 212, 12, 140, 90, 247, 46, 83, 254, 60, 54, 169, 255, 255, 128,
-        ]), true
-      ),
+        ]),
+      ).join(' '),
     ).toBe('a billet baiting glum crawl writhing deplane zyzzyva magnify pad safely');
   });
 
@@ -69,9 +72,7 @@ describe('bytesToPassphrase', () => {
       'bytes argument must be a Uint8Array',
     );
     // @ts-expect-error
-    expect(() => bytesToPassphrase('foo')).toThrow(
-      'bytes argument must be a Uint8Array',
-    );
+    expect(() => bytesToPassphrase('foo')).toThrow('bytes argument must be a Uint8Array');
   });
 });
 
@@ -89,13 +90,19 @@ describe('passphraseToBytes', () => {
   });
 
   test('converts a padded passphrase back to original odd length number of bytes', () => {
-    expect(passphraseToBytes('a accompanying pad safely')).toEqual(new Uint8Array([0x00, 0x00, 0x00]));
-    expect(passphraseToBytes('zyzzyva yoked pad safely')).toEqual(new Uint8Array([0xff, 0xff, 0xff]));
+    expect(passphraseToBytes('a accompanying pad safely')).toEqual(
+      new Uint8Array([0x00, 0x00, 0x00]),
+    );
+    expect(passphraseToBytes('zyzzyva yoked pad safely')).toEqual(
+      new Uint8Array([0xff, 0xff, 0xff]),
+    );
     expect(
-      passphraseToBytes('a billet baiting glum crawl writhing deplane zyzzyva magnify pad safely'),
+      passphraseToBytes(
+        'a billet baiting glum crawl writhing deplane zyzzyva magnify pad safely',
+      ),
     ).toEqual(
       new Uint8Array([
-        0, 0, 17, 212, 12, 140, 90, 247, 46, 83, 254, 60, 54, 169, 255, 255, 128
+        0, 0, 17, 212, 12, 140, 90, 247, 46, 83, 254, 60, 54, 169, 255, 255, 128,
       ]),
     );
   });
@@ -117,7 +124,7 @@ describe('passphraseToBytes', () => {
     );
     // @ts-expect-error
     expect(() => passphraseToBytes(1)).toThrow(
-      'passphrase must be an array, or a string with words separated by spaces',
+      'passphrase must be an array, or a string with words delimited by spaces',
     );
     expect(() => passphraseToBytes([])).toThrow('passphrase must have at least one word');
     // @ts-expect-error

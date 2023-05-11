@@ -41,5 +41,5 @@ describe('benchmark', () => {
     const bytes = passphraseToBytes(passphrase);
     const passphrase2 = bytesToPassphrase(bytes);
     expect(passphrase).toStrictEqual(passphrase2);
-  })
+  });
 });

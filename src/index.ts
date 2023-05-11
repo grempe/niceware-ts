@@ -76,15 +76,11 @@ function binarySearch(arr: string[], target: string, start: number): number {
 /**
  * Convert a Uint8Array into a passphrase.
  * @param {Uint8Array} bytes The bytes to convert to a passphrase.
- * @param {boolean} toString Whether to return the passphrase as a string or an array of words.
- * @returns {string | string[]} The passphrase as either a string or an array of words.
- * @throws {Error} If the bytes argument is not a Uint8Array or has an odd length.
+ * @returns {string[]} The passphrase as an array of words.
+ * @throws {Error} If the bytes argument is not a Uint8Array.
  * @throws {Error} If the word index calculated from the byte array is invalid.
  */
-export function bytesToPassphrase(
-  bytes: Uint8Array,
-  toString?: boolean,
-): string | string[] {
+export function bytesToPassphrase(bytes: Uint8Array): string[] {
   if (!(bytes instanceof Uint8Array)) {
     throw new Error('bytes argument must be a Uint8Array');
   }
@@ -109,20 +105,16 @@ export function bytesToPassphrase(
     }
   }
 
-  return toString ? passphrase.join(' ') : passphrase;
+  return passphrase;
 }
 
 /**
  * Generates a random passphrase with the specified underlying byte length.
  * @param {number} byteLen The number of random bytes to generate. Must be an even number between 2 and 1024.
- * @param {boolean} toString If true, returns the passphrase as a string of space separated words. Otherwise, returns an array of words.
- * @returns {string | string[]} A passphrase as an array of words or a string of space separated words.
+ * @returns {string[]} A passphrase as an array of words.
  * @throws {Error} If the byteLen argument is not a valid even number between 2 and 1024.
  */
-export function generatePassphrase(
-  byteLen: number,
-  toString?: boolean,
-): string | string[] {
+export function generatePassphrase(byteLen: number): string[] {
   if (
     typeof byteLen !== 'number' ||
     byteLen < MIN_PASSPHRASE_ENTROPY_BYTES ||
@@ -134,12 +126,12 @@ export function generatePassphrase(
     );
   }
 
-  return bytesToPassphrase(randomBytes(byteLen), toString);
+  return bytesToPassphrase(randomBytes(byteLen));
 }
 
 /**
  * Convert a passphrase into a Uint8Array.
- * @param {string | string[]} passphrase The passphrase to convert to bytes.
+ * @param {string | string[]} passphrase The passphrase to convert to bytes as a space delimited string or Array.
  * @returns {Uint8Array} The byte representation of the passphrase.
  * @throws {Error} If the passphrase argument is not a string or an array of strings.
  * @throws {Error} If a word in the passphrase is not found in the wordlist.
@@ -153,7 +145,7 @@ export function passphraseToBytes(passphrase: string | string[]): Uint8Array {
   // Test that the passphrase argument is an Array
   if (!Array.isArray(passphrase)) {
     throw new Error(
-      'passphrase must be an array, or a string with words separated by spaces',
+      'passphrase must be an array, or a string with words delimited by spaces',
     );
   }
 
