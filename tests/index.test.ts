@@ -107,6 +107,29 @@ describe('passphraseToBytes', () => {
     );
   });
 
+  test('converts a passphrase to bytes with improper spacing, newlines, tabs, etc', () => {
+    // ok
+    expect(passphraseToBytes('a billet baiting glum')).toEqual(new Uint8Array([
+      0, 0, 17, 212, 12, 140, 90, 247,
+    ]));
+    // internal spaces
+    expect(passphraseToBytes('a    billet    baiting    glum')).toEqual(new Uint8Array([
+      0, 0, 17, 212, 12, 140, 90, 247,
+    ]));
+    // leading/trailing spaces
+    expect(passphraseToBytes(' a billet baiting glum ')).toEqual(new Uint8Array([
+      0, 0, 17, 212, 12, 140, 90, 247,
+    ]));
+    // newlines
+    expect(passphraseToBytes('a\nbillet\nbaiting\nglum')).toEqual(new Uint8Array([
+      0, 0, 17, 212, 12, 140, 90, 247,
+    ]));
+    // tabs
+    expect(passphraseToBytes('a\tbillet\tbaiting\tglum')).toEqual(new Uint8Array([
+      0, 0, 17, 212, 12, 140, 90, 247,
+    ]));
+  });
+
   test('converts a max length passphrase to bytes', () => {
     const passphrase = generatePassphrase(512);
     expect(passphraseToBytes(passphrase).length).toEqual(512);
@@ -119,9 +142,9 @@ describe('passphraseToBytes', () => {
     expect(() => passphraseToBytes(' ')).toThrow(
       'passphrase words must contain only A-Z, case insensitive, and be no longer than 32 characters',
     );
-    expect(() => passphraseToBytes('a\nb')).toThrow(
-      'passphrase words must contain only A-Z, case insensitive, and be no longer than 32 characters',
-    );
+    // expect(() => passphraseToBytes('a\nb')).toThrow(
+    //   'passphrase words must contain only A-Z, case insensitive, and be no longer than 32 characters',
+    // );
     // @ts-expect-error
     expect(() => passphraseToBytes(1)).toThrow(
       'passphrase must be an array, or a string with words delimited by spaces',

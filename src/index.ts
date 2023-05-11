@@ -139,7 +139,11 @@ export function generatePassphrase(byteLen: number): string[] {
 export function passphraseToBytes(passphrase: string | string[]): Uint8Array {
   // If the passphrase is a space delimited string, split it into an array
   if (typeof passphrase === 'string') {
-    passphrase = passphrase.split(' ');
+    passphrase = passphrase
+    .replace(/\s+/g, ' ') // Replace multiple spaces with a single space
+    .trim() // Trim leading and trailing spaces
+    .replace(/[^a-zA-Z ]/g, '') // Remove non-alphabetic characters except spaces;
+    .split(' '); // Split on spaces
   }
 
   // Test that the passphrase argument is an Array
