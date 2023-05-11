@@ -35,4 +35,11 @@ describe('benchmark', () => {
       ]),
     );
   });
+
+  bench('round-trip', () => {
+    const passphrase = generatePassphrase(32);
+    const bytes = passphraseToBytes(passphrase);
+    const passphrase2 = bytesToPassphrase(bytes);
+    expect(passphrase).toStrictEqual(passphrase2);
+  })
 });

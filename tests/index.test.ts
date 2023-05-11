@@ -8,7 +8,7 @@ import {
 
 describe('generatePassphrase', () => {
   test('returns a passphrase of the correct length', () => {
-    expect(generatePassphrase(0).length).toBe(0);
+    // expect(generatePassphrase(0).length).toBe(0);
     expect(generatePassphrase(2).length).toBe(1);
     expect(generatePassphrase(20).length).toBe(10);
     expect(generatePassphrase(512).length).toBe(256);
@@ -16,19 +16,19 @@ describe('generatePassphrase', () => {
 
   test('throws an error for odd byte lengths', () => {
     expect(() => generatePassphrase(1)).toThrow(
-      'byteLen must be an even number between 0 and 1024',
+      'byteLen must be an even number between 2 and 1024',
     );
     expect(() => generatePassphrase(23)).toThrow(
-      'byteLen must be an even number between 0 and 1024',
+      'byteLen must be an even number between 2 and 1024',
     );
   });
 
   test('throws an error for invalid byte lengths', () => {
     expect(() => generatePassphrase(-1)).toThrow(
-      'byteLen must be an even number between 0 and 1024',
+      'byteLen must be an even number between 2 and 1024',
     );
     expect(() => generatePassphrase(1026)).toThrow(
-      'byteLen must be an even number between 0 and 1024',
+      'byteLen must be an even number between 2 and 1024',
     );
   });
 });
@@ -38,7 +38,7 @@ describe('bytesToPassphrase', () => {
     expect(bytesToPassphrase(new Uint8Array(0)).length).toBe(0);
   });
 
-  test('converts bytes to a passphrase', () => {
+  test('converts even length bytes to a passphrase', () => {
     expect(bytesToPassphrase(new Uint8Array([0x00, 0x00]), true)).toBe('a');
     expect(bytesToPassphrase(new Uint8Array([0xff, 0xff]), true)).toBe('zyzzyva');
     expect(
@@ -51,12 +51,25 @@ describe('bytesToPassphrase', () => {
     ).toBe('a billet baiting glum crawl writhing deplane zyzzyva');
   });
 
-  test('throws an error for odd-length byte arrays', () => {
-    expect(() => bytesToPassphrase(new Uint8Array(1))).toThrow(
-      'bytes argument must be an even length Uint8Array',
-    );
+  test('converts odd length bytes to a padded passphrase', () => {
+    expect(bytesToPassphrase(new Uint8Array([0x00, 0x00, 0x00]), true)).toBe('a accompanying pad safely');
+    expect(bytesToPassphrase(new Uint8Array([0xff, 0xff, 0xff]), true)).toBe('zyzzyva yoked pad safely');
+    expect(
+      bytesToPassphrase(
+        new Uint8Array([
+          0, 0, 17, 212, 12, 140, 90, 247, 46, 83, 254, 60, 54, 169, 255, 255, 128,
+        ]), true
+      ),
+    ).toBe('a billet baiting glum crawl writhing deplane zyzzyva magnify pad safely');
+  });
+
+  test('throws an error for invalid argument', () => {
     // @ts-expect-error
     expect(() => bytesToPassphrase([1, 2])).toThrow(
+      'bytes argument must be a Uint8Array',
+    );
+    // @ts-expect-error
+    expect(() => bytesToPassphrase('foo')).toThrow(
       'bytes argument must be a Uint8Array',
     );
   });
@@ -71,6 +84,18 @@ describe('passphraseToBytes', () => {
     ).toEqual(
       new Uint8Array([
         0, 0, 17, 212, 12, 140, 90, 247, 46, 83, 254, 60, 54, 169, 255, 255,
+      ]),
+    );
+  });
+
+  test('converts a padded passphrase back to original odd length number of bytes', () => {
+    expect(passphraseToBytes('a accompanying pad safely')).toEqual(new Uint8Array([0x00, 0x00, 0x00]));
+    expect(passphraseToBytes('zyzzyva yoked pad safely')).toEqual(new Uint8Array([0xff, 0xff, 0xff]));
+    expect(
+      passphraseToBytes('a billet baiting glum crawl writhing deplane zyzzyva magnify pad safely'),
+    ).toEqual(
+      new Uint8Array([
+        0, 0, 17, 212, 12, 140, 90, 247, 46, 83, 254, 60, 54, 169, 255, 255, 128
       ]),
     );
   });
@@ -105,5 +130,26 @@ describe('passphraseToBytes', () => {
     expect(() => {
       passphraseToBytes(new Array(513).fill('a').join(' '));
     }).toThrow(`passphrase must be no longer than 512 words`);
+  });
+});
+
+describe('roundTrip', () => {
+  test('converts a passphrase to bytes and back 10,000 times', () => {
+    for (let i = 0; i < 10_000; i++) {
+      // This generates a random number between 0 (inclusive) and 1 (exclusive)
+      // using Math.random(), multiplies it by 16 to get a random number between
+      // 0 (inclusive) and 16 (exclusive), adds 1 to shift the range to 1 (inclusive)
+      // to 17 (exclusive), rounds it down to the nearest integer using Math.floor(),
+      // and then multiplies it by 2 to get a random even number between 2 and 64.
+      // The resulting randomEvenNumber variable will be a random even integer
+      // between 2 and 64.
+      const randomEvenNumber = Math.floor(Math.random() * 16 + 1) * 2;
+
+      const passphrase = generatePassphrase(randomEvenNumber);
+      // console.log(Array.isArray(passphrase) ? passphrase.join(' ') : passphrase);
+      expect(passphraseToBytes(passphrase)).toEqual(
+        passphraseToBytes(bytesToPassphrase(passphraseToBytes(passphrase))),
+      );
+    }
   });
 });

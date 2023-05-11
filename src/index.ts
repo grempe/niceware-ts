@@ -2,7 +2,50 @@ import { randomBytes } from '@stablelib/random';
 
 import { wordlist } from './wordlist';
 
+export const MIN_PASSPHRASE_ENTROPY_BYTES = 2;
 export const MAX_PASSPHRASE_ENTROPY_BYTES = 1024;
+
+/**
+ * A Uint8Array of 5 bytes that serves as the marker to indicate that an array
+ * has been padded to an even length. The values were carefully chosen to be unlikely to
+ * occur in a random array and will also always add one new random word and
+ * the words "pad safely" to the tail end of passphrase.
+ */
+const PAD_MARKER = new Uint8Array([0x128, 0x9a, 0x6d, 0xc0, 0x6b]);
+
+/**
+ * Pads a Uint8Array to an even length by appending the PAD_MARKER if the array
+ * length is odd.
+ *
+ * @param {Uint8Array} arr - The Uint8Array to pad.
+ * @returns The padded Uint8Array.
+ */
+function padUint8ArrayToEvenLength(arr: Uint8Array): Uint8Array {
+  if (arr.length % 2 === 1) {
+    const paddedArr = new Uint8Array(arr.length + PAD_MARKER.length);
+    paddedArr.set(arr);
+    paddedArr.set(PAD_MARKER, arr.length);
+    return paddedArr;
+  } else {
+    return arr;
+  }
+}
+
+/**
+ * Removes the PAD_MARKER from a padded Uint8Array, if present, to return the
+ * original unpadded Uint8Array.
+ *
+ * @param {Uint8Array} paddedArr - The potentially padded Uint8Array to unpad.
+ * @returns The original array if no padding marker is found, otherwise the unpadded Uint8Array.
+ */
+function unpadUint8ArrayFromEvenLength(paddedArr: Uint8Array): Uint8Array {
+  const marker = paddedArr.slice(paddedArr.length - PAD_MARKER.length);
+  if (marker.every((value, index) => value === PAD_MARKER[index])) {
+    return paddedArr.slice(0, paddedArr.length - PAD_MARKER.length);
+  } else {
+    return paddedArr;
+  }
+}
 
 /**
  * Performs a binary search on the wordlist to find the index of the target word.
@@ -46,9 +89,7 @@ export function bytesToPassphrase(
     throw new Error('bytes argument must be a Uint8Array');
   }
 
-  if (bytes.length % 2 === 1) {
-    throw new Error('bytes argument must be an even length Uint8Array');
-  }
+  const paddedBytes = padUint8ArrayToEvenLength(bytes);
 
   // The following code is responsible for converting each byte in the byte
   // array to a word index and adding the corresponding word to the passphrase.
@@ -57,9 +98,9 @@ export function bytesToPassphrase(
   // expression retrieves the word corresponding to the calculated word index
   // from the wordlist array.
   const passphrase: string[] = [];
-  for (const entry of bytes.entries()) {
+  for (const entry of paddedBytes.entries()) {
     const [index, byte] = entry;
-    const next = bytes[index + 1];
+    const next = paddedBytes[index + 1];
 
     if (index % 2 === 0) {
       const wordIndex = byte * 256 + next; // max value is 255 * 256 + 255 = 65535
@@ -73,10 +114,10 @@ export function bytesToPassphrase(
 
 /**
  * Generates a random passphrase with the specified underlying byte length.
- * @param {number} byteLen The number of random bytes to generate. Must be an even number between 0 and 1024.
+ * @param {number} byteLen The number of random bytes to generate. Must be an even number between 2 and 1024.
  * @param {boolean} toString If true, returns the passphrase as a string of space separated words. Otherwise, returns an array of words.
  * @returns {string | string[]} A passphrase as an array of words or a string of space separated words.
- * @throws {Error} If the byteLen argument is not a valid even number between 0 and 1024.
+ * @throws {Error} If the byteLen argument is not a valid even number between 2 and 1024.
  */
 export function generatePassphrase(
   byteLen: number,
@@ -84,12 +125,12 @@ export function generatePassphrase(
 ): string | string[] {
   if (
     typeof byteLen !== 'number' ||
-    byteLen < 0 ||
+    byteLen < MIN_PASSPHRASE_ENTROPY_BYTES ||
     byteLen > MAX_PASSPHRASE_ENTROPY_BYTES ||
     byteLen % 2 === 1
   ) {
     throw new Error(
-      `byteLen must be an even number between 0 and ${MAX_PASSPHRASE_ENTROPY_BYTES}`,
+      `byteLen must be an even number between ${MIN_PASSPHRASE_ENTROPY_BYTES} and ${MAX_PASSPHRASE_ENTROPY_BYTES}`,
     );
   }
 
@@ -154,5 +195,7 @@ export function passphraseToBytes(passphrase: string | string[]): Uint8Array {
     bytes[2 * index + 1] = wordIndex % 256;
   });
 
-  return bytes;
+  const unpaddedBytes = unpadUint8ArrayFromEvenLength(bytes);
+
+  return unpaddedBytes;
 }

@@ -33,6 +33,7 @@ Web Demo: <https://diracdeltas.github.io/niceware/>
 
 - Encode/Decode passphrases as an Array or words, or a space-delimited string or
   words
+- encode/decode odd length `Uint8Array`s, padding the output
 - Exports ESM, CommonJS, and TypeScript declaration files
 - [Deno](https://deno.land) compatible
 - New runtime safety checks with improved error messaging
@@ -51,7 +52,11 @@ npm install niceware-ts
 Then, import the functions you need from the module:
 
 ```typescript
-import { bytesToPassphrase, generatePassphrase, passphraseToBytes } from 'niceware-ts';
+import {
+  bytesToPassphrase,
+  generatePassphrase,
+  passphraseToBytes,
+} from "niceware-ts";
 
 // Generate a passphrase with 16 bytes (128 bits) of entropy
 const passphrase = generatePassphrase(16, true);
