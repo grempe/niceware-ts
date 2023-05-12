@@ -4,6 +4,7 @@ import { wordlist } from './wordlist';
 
 export const MIN_PASSPHRASE_ENTROPY_BYTES = 2;
 export const MAX_PASSPHRASE_ENTROPY_BYTES = 1024;
+export const WORDLIST = wordlist;
 
 /**
  * A Uint8Array of 5 bytes that serves as the marker to indicate that an array
